@@ -8,34 +8,71 @@ Skills use the **SKILL.md** format with YAML frontmatter, making them portable a
 
 | Skill | Description |
 |-------|-------------|
-| [`sql-planner`](./sql-planner/SKILL.md) | Generate SQL from natural language — discovers runners, loads schema, and delegates execution |
-| [`run-sql`](./run-sql/SKILL.md) | Execute SQL on the local dev database — auto-detects connection method from project context |
+| [`sql-planner`](./sql-planner/SKILL.md) | Natural language → SQL → execute. Auto-detects local DB, discovers connectors for remote environments |
+| [`sql-planner:new-connector`](./sql-planner/new-connector/SKILL.md) | Wizard to generate a project connector with domain knowledge and remote environments |
 
 ## Skill Details
 
 ### sql-planner
 
-Translates natural language into SQL queries. It works as an orchestrator:
+Translates natural language into SQL and executes it against the database. Installed at user level (`~/.claude/skills/`).
 
-1. **Discovers runners** — scans for skills that expose a `## SQL Runner` section (project-level and user-level)
-2. **Selects a runner** — evaluates each runner's claim conditions against the user's request
-3. **Loads context** — reads the runner's DB engine, domain knowledge, and schema
-4. **Generates SQL** — produces a query in the correct dialect (MySQL / PostgreSQL / SQLite), with `LIMIT 25` by default
-5. **Confirms with the user** — displays the SQL before execution
-6. **Delegates execution** — hands off to the claiming runner skill
+**How it works:**
 
-Safety: read-only by default, warns on write operations, never generates `DROP DATABASE` or `TRUNCATE`.
+1. **Detects connection** — auto-detects the local DB from project files (docker-compose, Django, Rails, SQLite)
+2. **Discovers connectors** — scans for project-level skills with a `## SQL Connector` section
+3. **Loads schema** — caches schema in `.claude/sql-planner/schema.tsv`, auto-regenerates when stale
+4. **Generates SQL** — produces a query in the correct dialect using schema + domain knowledge from connector
+5. **Confirms & executes** — read-only queries run directly on local; write operations always require confirmation
+6. **Displays results** — formats and shows the output
 
-### run-sql
+**Safety:** read-only by default, warns on write operations, never generates `DROP DATABASE` or `TRUNCATE`.
 
-Executes SQL on the local development database. Acts as a **runner** for `sql-planner` and can also be used standalone.
+### Connectors
 
-Connection detection priority:
-1. `.claude/natural-sql/config.md` with a `## Query Command` section
-2. Auto-detect from project files (`docker-compose.yml`, Django settings, Rails database config, SQLite)
-3. Falls back to asking the user
+Connectors are project-level skills that extend `sql-planner` with:
 
-Claims queries when the user mentions local/dev context, or when no other runner matches (default fallback).
+- **Domain knowledge** — table meanings, relationships, business conventions
+- **Remote environments** — connection commands for staging, production, etc.
+- **Engine config** — explicit DB engine when auto-detection isn't enough
+
+Connectors live in `.claude/skills/sql-planner-<project>/SKILL.md` and are discovered automatically by `sql-planner`.
+
+**Create a connector:**
+
+```bash
+# Use the built-in wizard
+/sql-planner:new-connector
+```
+
+**Connector example:**
+
+```markdown
+---
+name: sql-planner:myproject
+description: Connector for myproject databases
+version: 1.0.0
+---
+
+## SQL Connector
+
+- Engine: MySQL
+
+## Environments
+
+### staging
+`ssh staging-bastion "mysql -h staging-db.internal -u app -pXXX mydb --table -e '{sql}'"`
+
+### production
+`ssh prod-bastion "mysql -h prod-db.internal -u readonly -pXXX mydb --table -e '{sql}'"`
+
+## Domain Knowledge
+
+- `users`: stores user accounts (email, name, status)
+- `orders`: purchase orders linked to users via user_id
+- `status = 1` means active, `status = 0` means inactive
+- When counting "users without orders", use LEFT JOIN orders + WHERE NULL
+```
 
 ## Installation
 
@@ -44,13 +81,11 @@ Claims queries when the user mentions local/dev context, or when no other runner
 Install individual skills with [`npx skills`](https://www.npmjs.com/package/skills):
 
 ```bash
-# Install a specific skill globally (user-level, ~/.claude/skills/)
+# Install sql-planner globally (user-level, ~/.claude/skills/)
 npx skills add wilmanbarrios/skills/sql-planner -g
-npx skills add wilmanbarrios/skills/run-sql -g
 
-# Install a specific skill at project level (.claude/skills/)
+# Install at project level (.claude/skills/)
 npx skills add wilmanbarrios/skills/sql-planner
-npx skills add wilmanbarrios/skills/run-sql
 
 # Install all skills at once
 npx skills add wilmanbarrios/skills --all -g
@@ -66,7 +101,6 @@ Clone and copy individual skill folders to `~/.claude/skills/`:
 ```bash
 git clone https://github.com/wilmanbarrios/skills.git
 cp -r skills/sql-planner ~/.claude/skills/
-cp -r skills/run-sql ~/.claude/skills/
 ```
 
 ### Opencode
@@ -76,7 +110,6 @@ Copy skills to `~/.config/opencode/skills/` (user-level) or `.opencode/skills/` 
 ```bash
 git clone https://github.com/wilmanbarrios/skills.git
 cp -r skills/sql-planner ~/.config/opencode/skills/
-cp -r skills/run-sql ~/.config/opencode/skills/
 ```
 
 ## Adding New Skills
