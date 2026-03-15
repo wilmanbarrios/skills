@@ -64,7 +64,17 @@ Also check for `.claude/natural-sql/schema.tsv` as a generic local schema fallba
 
 ## Step 5 — Show SQL for Confirmation
 
-Display the generated SQL to the user. Wait for them to confirm before proceeding.
+Use the `AskUserQuestion` tool to present the generated SQL and let the user choose what to do next.
+
+- **question**: A brief message like "¿Ejecutar este query?" or "Run this query?"
+- **preview**: The generated SQL (formatted in a code block)
+- **options**: `["Ejecutar", "Editar", "Cancelar"]`
+
+Behavior based on the user's choice:
+- **Ejecutar** → proceed to Step 6
+- **Editar** → ask what changes they want, regenerate, and show Step 5 again
+- **Cancelar** → stop, do not execute anything
+- **Other** (free-text) → treat as instructions to adjust the query, regenerate, and show Step 5 again
 
 ## Step 6 — Delegate to Claiming Runner
 
