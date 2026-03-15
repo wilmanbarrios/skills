@@ -9,7 +9,11 @@ Wizard that generates a `sql-planner` connector for the current project.
 
 A connector is a project-level skill that provides `sql-planner` with: domain knowledge (table meanings, relationships, business conventions), remote environment connections, and engine configuration.
 
-## Step 1 — Infer Domain Knowledge
+## Step 1 — Gather Context (parallel)
+
+Run these two tasks in parallel:
+
+### 1a. Infer Domain Knowledge
 
 Launch an Agent (subagent_type: Explore) to analyze the project and infer domain knowledge:
 
@@ -19,6 +23,16 @@ Launch an Agent (subagent_type: Explore) to analyze the project and infer domain
 - Infer: what tables exist, how they relate, what fields mean, naming conventions, status/enum values
 
 The agent returns a structured summary of domain knowledge.
+
+### 1b. Detect Engine
+
+Infer the DB engine from the project (same approach as sql-planner Step 1a):
+
+- `docker-compose.yml` → mysql/postgres
+- Django DATABASES → ENGINE
+- Rails database.yml → adapter
+- `db.sqlite3` → SQLite
+- If unclear → ask the user
 
 ## Step 2 — Configure Environments
 
@@ -32,17 +46,7 @@ For each selected environment, ask with `AskUserQuestion`:
 
 The `{sql}` placeholder is where `sql-planner` will inject the generated query at runtime.
 
-## Step 3 — Detect Engine
-
-Infer the DB engine from the project (same approach as sql-planner Step 1a):
-
-- `docker-compose.yml` → mysql/postgres
-- Django DATABASES → ENGINE
-- Rails database.yml → adapter
-- `db.sqlite3` → SQLite
-- If unclear → ask the user
-
-## Step 4 — Generate Connector
+## Step 3 — Generate Connector
 
 Determine the project name from the current directory name or package config.
 
@@ -69,6 +73,6 @@ version: 1.0.0
 <inferred domain knowledge from Step 1>
 ```
 
-## Step 5 — Review
+## Step 4 — Review
 
 Show the generated connector file to the user for review and adjustments. Apply any requested changes before finishing.

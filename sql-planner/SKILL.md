@@ -1,21 +1,18 @@
 ---
 name: sql-planner
 description: >-
-  Natural language → SQL → execute against the database. Auto-detects local connection, discovers project connectors for remote environments and domain knowledge.
+  Natural language → SQL → execute read queries against the database. Auto-detects local connection, discovers project connectors for remote environments and domain knowledge.
   TRIGGER when: user asks a data question in natural language (count, list, show, verify, check, how many, cuantos, traeme, muéstrame), mentions database tables, or asks about data in any environment (production, staging, dev, local).
   DO NOT TRIGGER when: user provides raw SQL ready to execute.
 version: 2.0.0
 ---
-
-Natural language → SQL → execute against the database. Auto-detects local connection, discovers project connectors for remote environments and domain knowledge.
 
 ## Claim Conditions
 
 This skill is the entry point for any data question expressed in natural language.
 
 **I claim when:**
-- User asks a question about data in natural language (English or Spanish)
-- User wants to "check", "count", "list", "show", "verify", "find" data
+- User asks a question about data in natural language (English or Spanish): "how many", "count", "list", "show", "verify", "check", "find", "cuantos", "traeme", "muéstrame"
 - User mentions a database table or business entity (users, subscriptions, sessions, etc.)
 - User asks about data in ANY environment (production, staging, dev, local)
 
@@ -27,9 +24,11 @@ This skill is the entry point for any data question expressed in natural languag
 
 $ARGUMENTS = natural language describing what data the user wants.
 
-## Step 1 — Gather Context (parallelized)
+## Step 1 — Gather Context
 
-Run these 3 tasks in parallel:
+Run these tasks in parallel where possible:
+
+**Phase A (parallel):**
 
 ### 1a. Detect DB Connection & Engine
 
@@ -49,18 +48,22 @@ From the detected engine, infer the SQL dialect (MySQL, PostgreSQL, SQLite).
 
 Search for project-level connectors:
 
-1. Glob for `.claude/skills/**/SKILL.md` in the current project directory
-2. Grep or Read each result looking for a `## SQL Connector` section
-3. If found → read: engine, environments, domain knowledge
-4. If the user asks for a remote environment and NO connector exists → inform them and suggest: `/sql-planner:new-connector`
+1. Grep for `## SQL Connector` within `.claude/skills/**/SKILL.md` in the current project directory
+2. If found → read the matching file(s) for engine, environments, domain knowledge
+3. If the user asks for a remote environment and NO connector exists → inform them and suggest: `/sql-planner:new-connector`
 
-### 1c. Load & Validate Schema
+### 1c. Read Schema Cache
 
-1. If `.claude/sql-planner/schema.tsv` exists:
-   - The first line contains metadata: `# count:<N>` (number of total columns)
-   - Execute a quick count against the DB and compare with N
-   - If differs → regenerate; if matches → use cache
-2. If NOT exists → generate automatically from INFORMATION_SCHEMA / `.schema` and save with metadata count
+If `.claude/sql-planner/schema.tsv` exists, read it and extract the `# count:<N>` metadata from the first line. Otherwise, note that schema needs to be generated.
+
+**Phase B (after 1a completes):**
+
+### 1d. Validate or Generate Schema
+
+Using the DB connection from 1a and the cache state from 1c:
+
+1. If cache exists → execute a quick column count against the DB and compare with N. If differs → regenerate; if matches → use cache.
+2. If cache does NOT exist → generate from INFORMATION_SCHEMA / `.schema` and save with metadata count.
 
 **Schema generation commands:**
 
@@ -91,16 +94,11 @@ SELECT table_name, string_agg(column_name || ' ' || data_type, ', ' ORDER BY ord
 
 Apply these rules based on the query type and target environment:
 
-- **READ-ONLY + local** → execute directly, no confirmation needed
+- **READ-ONLY + local** → show the SQL and execute directly, no confirmation needed
 - **READ-ONLY + remote** → use `AskUserQuestion` to confirm the target environment before executing
-- **Write operation (INSERT, UPDATE, DELETE, DROP, ALTER, TRUNCATE, CREATE) in ANY environment** → **ALWAYS** require approval via `AskUserQuestion`. No exceptions.
-  - **question**: "⚠️ This query modifies data. Execute?"
-  - **preview**: the generated SQL
-  - **options**: `["Ejecutar", "Editar", "Cancelar"]`
-  - Editar / Other → adjust query, return to Step 3
-  - Cancelar → stop
+- **Write operation (INSERT, UPDATE, DELETE, DROP, ALTER, TRUNCATE, CREATE)** → **show the generated SQL only**. Do NOT execute. Explain that this skill does not execute write operations — the user can copy and run the query themselves.
 
-When executing against a remote environment, use the connection command from the connector's `## Environments` section, replacing `{sql}` with the generated query.
+When executing read queries against a remote environment, use the connection command from the connector's `## Environments` section, replacing `{sql}` with the generated query.
 
 ## Step 4 — Display Results
 
@@ -108,11 +106,11 @@ Format and show the output to the user.
 
 ## Safety Rules
 
-- **READ-ONLY by default.**
-- Warn on write operations (`INSERT`, `UPDATE`, `DELETE`, `DROP`, `ALTER`, `TRUNCATE`, `CREATE`)
-- **Never generate** `DROP DATABASE` or `TRUNCATE`
+- **Read-only execution.** This skill only executes `SELECT` queries.
+- Write queries (`INSERT`, `UPDATE`, `DELETE`, `DROP`, `ALTER`, `TRUNCATE`, `CREATE`) are generated and shown but **never executed**.
+- **Never generate** `DROP DATABASE`
 - Always show the SQL before executing
-- Remote environments: additional warning before executing
+- Remote environments: confirm target before executing
 
 ## Schema Maintenance
 
