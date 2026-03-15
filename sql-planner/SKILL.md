@@ -1,10 +1,27 @@
 ---
 name: sql-planner
-description: Generate SQL from natural language. Discovers available runners, reads their schema/domain knowledge, generates the query, and delegates execution.
+description: >-
+  Generate SQL from natural language. Discovers available runners, reads their schema/domain knowledge, generates the query, and delegates execution.
+  TRIGGER when: user asks a data question in natural language (count, list, show, verify, check, how many, cuantos, traeme, muéstrame), mentions database tables, or asks about data in any environment (production, staging, dev, local).
+  DO NOT TRIGGER when: user provides raw SQL ready to execute.
 version: 1.0.0
 ---
 
 Generate SQL from natural language. Discovers available runners, reads their schema/domain knowledge, generates the query, and delegates execution.
+
+## Claim Conditions
+
+This skill is the **universal entry point** for any data question expressed in natural language. It MUST be invoked BEFORE any specific runner (`run-sql`, `telespine:run-sql`, etc.).
+
+**I claim when:**
+- User asks a question about data in natural language (English or Spanish)
+- User wants to "check", "count", "list", "show", "verify", "find" data
+- User mentions a database table or business entity (users, subscriptions, sessions, etc.)
+- User asks about data in ANY environment (production, staging, dev, local)
+
+**I do NOT claim when:**
+- User provides a complete SQL query ready to execute
+- User explicitly invokes a specific runner (e.g., `/run-sql SELECT ...`)
 
 ## Input
 
