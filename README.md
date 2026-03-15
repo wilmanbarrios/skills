@@ -39,21 +39,34 @@ Claims queries when the user mentions local/dev context, or when no other runner
 
 ## Installation
 
-### Claude Code (Marketplace)
+### Using the skills CLI (recommended)
 
-Add the following to your `~/.claude/settings.json`:
+Install individual skills with [`npx skills`](https://www.npmjs.com/package/skills):
 
-```json
-{
-  "extraKnownMarketplaces": {
-    "skills": {
-      "source": {
-        "source": "github",
-        "repo": "wilmanbarrios/skills"
-      }
-    }
-  }
-}
+```bash
+# Install a specific skill globally (user-level, ~/.claude/skills/)
+npx skills add wilmanbarrios/skills/sql-planner -g
+npx skills add wilmanbarrios/skills/run-sql -g
+
+# Install a specific skill at project level (.claude/skills/)
+npx skills add wilmanbarrios/skills/sql-planner
+npx skills add wilmanbarrios/skills/run-sql
+
+# Install all skills at once
+npx skills add wilmanbarrios/skills --all -g
+
+# List available skills without installing
+npx skills add wilmanbarrios/skills -l
+```
+
+### Manual
+
+Clone and copy individual skill folders to `~/.claude/skills/`:
+
+```bash
+git clone https://github.com/wilmanbarrios/skills.git
+cp -r skills/sql-planner ~/.claude/skills/
+cp -r skills/run-sql ~/.claude/skills/
 ```
 
 ### Opencode
@@ -64,16 +77,6 @@ Copy skills to `~/.config/opencode/skills/` (user-level) or `.opencode/skills/` 
 git clone https://github.com/wilmanbarrios/skills.git
 cp -r skills/sql-planner ~/.config/opencode/skills/
 cp -r skills/run-sql ~/.config/opencode/skills/
-```
-
-### Manual
-
-Copy individual skill folders to `~/.claude/skills/`:
-
-```bash
-git clone https://github.com/wilmanbarrios/skills.git
-cp -r skills/sql-planner ~/.claude/skills/
-cp -r skills/run-sql ~/.claude/skills/
 ```
 
 ## Adding New Skills
