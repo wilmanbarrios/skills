@@ -2,7 +2,7 @@
 name: worklog
 description: >-
   Review and organize your daily work log. Auto-installs a hook that captures
-  every prompt from ~/Code/work/ projects into ~/.claude/worklog/YYYYMMDD.md.
+  every prompt from ~/Code/Work/ projects into ~/.claude/worklog/YYYYMMDD.md.
   TRIGGER when: user invokes /worklog or asks to see their work log / diary.
   DO NOT TRIGGER when: user asks about git log or commit history.
 version: 1.0.0
@@ -55,7 +55,7 @@ Look for a `UserPromptSubmit` hook whose command contains `worklog`. If found, s
 **Important**: If `hooks.UserPromptSubmit` already has entries, append to the array — do not replace.
 
 6. Write the updated settings back to `~/.claude/settings.json`
-7. Inform the user: "Worklog hook installed. It will start capturing prompts from `~/Code/work/` projects in your next session."
+7. Inform the user: "Worklog hook installed. It will start capturing prompts from `~/Code/Work/` projects in your next session."
 
 ## Step 1 — Determine Target Date(s)
 

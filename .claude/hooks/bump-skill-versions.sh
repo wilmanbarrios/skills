@@ -5,7 +5,7 @@
 set -euo pipefail
 
 # Find modified (not added) SKILL.md files in the staging area
-modified_skills=$(git diff --cached --diff-filter=M --name-only -- '**/SKILL.md' 2>/dev/null || true)
+modified_skills=$(git diff --cached --diff-filter=MR --name-only -- '**/SKILL.md' 2>/dev/null || true)
 
 if [[ -z "$modified_skills" ]]; then
   exit 0

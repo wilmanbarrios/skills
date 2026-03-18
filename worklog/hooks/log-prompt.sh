@@ -12,7 +12,7 @@ CWD=$(echo "$INPUT" | jq -r '.cwd // empty' 2>/dev/null) || exit 0
 [ -z "$PROMPT" ] && exit 0
 
 # Only log prompts from work projects
-WORK_DIR="$HOME/Code/work"
+WORK_DIR="$HOME/Code/Work"
 case "$CWD" in "$WORK_DIR"/*) ;; *) exit 0 ;; esac
 
 PROJECT=$(basename "${CWD:-unknown}")
