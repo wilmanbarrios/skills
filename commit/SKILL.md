@@ -7,6 +7,7 @@ description: >-
   DO NOT TRIGGER when: user wants to push, create a PR, or amend a commit.
 version: 1.0.0
 disable-model-invocation: true
+allowed-tools: Bash(git diff *), Bash(git status), Bash(git log *), Bash(git branch *), Bash(git add *), Bash(git commit *)
 ---
 
 ## Input
@@ -83,12 +84,11 @@ Compose the commit message following these rules strictly:
 
 ## Step 3 — Confirm & Commit
 
-1. Show the drafted commit message to the user in a code block
-2. Use `AskUserQuestion` to confirm. Offer options:
-   - **Yes** — commit as drafted
+1. Use `AskUserQuestion` to confirm. Use the `preview` field on the "Yes" option to show the drafted commit message in a monospace box:
+   - **Yes (Recommended)** — description: "Commit with this message", preview: the full commit message
    - **Edit** — let the user provide a revised message
    - **Abort** — cancel
-3. On confirmation, execute the commit using a HEREDOC:
+2. On confirmation, execute the commit using a HEREDOC:
 
 ```bash
 git commit -m "$(cat <<'EOF'
@@ -97,4 +97,4 @@ EOF
 )"
 ```
 
-4. Run `git status` after the commit to verify success and show the result.
+3. Run `git status` after the commit to verify success and show the result.
