@@ -12,6 +12,7 @@ Skills use the **SKILL.md** format with YAML frontmatter, making them portable a
 | [`git:branch`](./git/branch/SKILL.md) | Create well-named git branches with consistent type/description/target conventions |
 | [`sql-planner`](./sql-planner/SKILL.md) | Natural language → SQL → execute. Auto-detects local DB, discovers connectors for remote environments |
 | [`sql-planner:new-connector`](./sql-planner/new-connector/SKILL.md) | Wizard to generate a project connector with domain knowledge and remote environments |
+| [`worklog`](./worklog/SKILL.md) | Review and organize daily work logs. Auto-installs a hook that captures prompts from `~/Code/work/` projects |
 
 ## Installation
 
