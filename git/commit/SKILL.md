@@ -1,5 +1,5 @@
 ---
-name: commit
+name: git:commit
 description: >-
   Create well-formatted git commits following consistent conventions.
   Extracts ticket ID from branch, uses imperative mood, lowercase after prefix.
