@@ -12,7 +12,12 @@ allowed-tools: Read, Glob, Bash(cat *), Bash(cp *), Bash(chmod *), Bash(ls *), B
 
 ## Input
 
-$ARGUMENTS = optional date (`20260318` or `2026-03-18`) or `week` for weekly summary.
+$ARGUMENTS = one of:
+
+- **Empty** → full day organized worklog (today)
+- **Date** → `20260318` or `2026-03-18`
+- **`week`** → weekly summary (last 7 days)
+- **Time range** → `9am - 1pm`, `14:00 - 17:30`, `10am - 3:30pm` (filters today's entries to that window)
 
 ## Step 0 — Auto-setup Hook
 
@@ -57,13 +62,17 @@ Look for a `UserPromptSubmit` hook whose command contains `worklog`. If found, s
 6. Write the updated settings back to `~/.claude/settings.json`
 7. Inform the user: "Worklog hook installed. It will start capturing prompts from `~/Code/Work/` projects in your next session."
 
-## Step 1 — Determine Target Date(s)
+## Step 1 — Determine Target Date(s) and Time Range
 
 Parse `$ARGUMENTS`:
 
-- **Empty** → today's date (`YYYYMMDD`)
+- **Empty** → today's date (`YYYYMMDD`), no time filter
 - **`week`** → last 7 days (today through 6 days ago)
 - **Date string** → normalize to `YYYYMMDD` (accept `YYYY-MM-DD` or `YYYYMMDD`)
+- **Time range** → today's date + filter entries to that window. Parse formats:
+  - `9am - 1pm`, `9:30am - 2pm`, `09:00 - 13:00`, `2 - 7:30pm`
+  - Convert to 24h for comparison against the `HH:MM` timestamps in entries
+  - If only one boundary has am/pm, infer the other (e.g. `2 - 7:30pm` → both PM)
 
 ## Step 2 — Read Raw Entries
 
@@ -71,48 +80,21 @@ For each target date, read `~/.claude/worklog/YYYYMMDD.md`.
 
 If no file exists for the requested date(s), inform the user that there are no entries and stop.
 
-## Step 3 — Organize and Present
+## Step 3 — Generate Prose Report
 
-Group entries by:
+Produce a **concise prose summary** suitable for non-technical stakeholders
+(e.g. pasting into Slack, Jira, or a standup note).
 
-1. **Project** (the value between backticks in each entry)
-2. **Feature/task** — infer macro-level tasks by analyzing prompt similarity within each project
-
-Present the organized summary in this format:
-
-```markdown
-# Worklog — YYYY-MM-DD
-
-## project-name | Feature/Task Description
-- **HH:MM** — Brief description derived from the prompt
-- **HH:MM** — Another entry
-
-## other-project | Another Feature
-- **HH:MM** — Description
-```
-
-For `/worklog week`, use this format:
-
-```markdown
-# Weekly Worklog — YYYY-MM-DD to YYYY-MM-DD
-
-## YYYY-MM-DD (Day)
-
-### project-name | Feature
-- **HH:MM** — Description
-
----
-
-## YYYY-MM-DD (Day)
-...
-```
-
-### Guidelines for organizing
-
-- Preserve all timestamps exactly as recorded
-- Derive concise descriptions from the raw prompt text (clean up, don't invent)
-- Group related prompts into features/tasks based on semantic similarity
-- Name features descriptively (e.g., "Payment Refunds", "UI Fixes", "API Migration")
+Rules:
+- Write 1-2 short paragraphs per project/ticket in plain English
+- Lead with the ticket ID if all work is on the same ticket
+- Focus on **what was accomplished**, not technical details
+- Omit internal tool names, stack names, error messages, CLI commands
+- No markdown formatting (no bullets, headers, or code blocks) — just plain text
+- Group related work into coherent sentences instead of listing each action
+- Skip automated/cron entries (monitoring loops, task notifications)
+- If a time range was provided, only include entries within that window
+- For `/worklog week`, produce one paragraph per day that had activity
 
 ## Step 4 — Offer to Save
 
