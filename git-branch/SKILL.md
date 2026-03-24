@@ -1,5 +1,5 @@
 ---
-name: git:branch
+name: git-branch
 description: >-
   Create well-named git branches with consistent naming conventions.
   Guides through branch type, description, and target branch selection.
@@ -7,7 +7,7 @@ description: >-
   or wants to start working on a new feature/fix/task.
   DO NOT TRIGGER when: user wants to switch to an existing branch,
   delete a branch, or rename a branch.
-version: 1.0.0
+version: 2.0.0
 disable-model-invocation: true
 allowed-tools: Bash(git branch *), Bash(git switch *), Bash(git status*), Bash(git stash *), Bash(git fetch *)
 ---
