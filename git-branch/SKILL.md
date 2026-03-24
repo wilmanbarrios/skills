@@ -7,7 +7,8 @@ description: >-
   or wants to start working on a new feature/fix/task.
   DO NOT TRIGGER when: user wants to switch to an existing branch,
   delete a branch, or rename a branch.
-version: 2.0.0
+version: 2.0.1
+effort: medium
 disable-model-invocation: true
 allowed-tools: Bash(git branch *), Bash(git switch *), Bash(git status*), Bash(git stash *), Bash(git fetch *)
 ---
