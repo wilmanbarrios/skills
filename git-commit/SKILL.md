@@ -88,7 +88,8 @@ Compose the commit message following these rules strictly:
    - **Yes (Recommended)** — description: "Commit with this message", preview: the full commit message
    - **Edit** — let the user provide a revised message
    - **Abort** — cancel
-2. On confirmation, execute the commit using a HEREDOC:
+2. If files need staging, run `git add <files>` first as a **separate** Bash call.
+3. Then execute the commit in its own Bash call using a HEREDOC:
 
 ```bash
 git commit -m "$(cat <<'EOF'
@@ -97,4 +98,4 @@ EOF
 )"
 ```
 
-3. Run `git status` after the commit to verify success and show the result.
+4. Run `git status` after the commit to verify success and show the result.
