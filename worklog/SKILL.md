@@ -5,7 +5,7 @@ description: >-
   every prompt from ~/Code/Work/ projects into ~/.claude/worklog/YYYYMMDD.md.
   TRIGGER when: user invokes /worklog or asks to see their work log / diary.
   DO NOT TRIGGER when: user asks about git log or commit history.
-version: 1.0.0
+version: 1.0.1
 effort: medium
 disable-model-invocation: true
 allowed-tools: Read, Glob, Bash(cat *), Bash(cp *), Bash(chmod *), Bash(ls *), Bash(date *), Edit, Write

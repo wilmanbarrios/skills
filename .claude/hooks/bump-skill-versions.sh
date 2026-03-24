@@ -1,8 +1,16 @@
 #!/usr/bin/env bash
 # Auto-bump skill versions based on staged changes.
-# Runs as a PreToolUse hook on Bash(git commit*).
+# Runs as a PreToolUse hook on Bash — filters for git commit commands.
 
 set -euo pipefail
+
+# Read hook input and check if the command is a git commit
+input=$(cat)
+command=$(echo "$input" | jq -r '.tool_input.command // empty')
+
+if [[ ! "$command" =~ ^git\ commit ]]; then
+  exit 0
+fi
 
 # Find modified (not added) SKILL.md files in the staging area
 modified_skills=$(git diff --cached --diff-filter=MR --name-only -- '**/SKILL.md' 2>/dev/null || true)
