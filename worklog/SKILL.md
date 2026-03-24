@@ -6,8 +6,9 @@ description: >-
   TRIGGER when: user invokes /worklog or asks to see their work log / diary.
   DO NOT TRIGGER when: user asks about git log or commit history.
 version: 1.0.0
+effort: medium
 disable-model-invocation: true
-allowed-tools: Read, Glob, Bash(cat *), Bash(cp *), Bash(chmod *), Bash(ls *), Bash(date *), Edit, Write, AskUserQuestion
+allowed-tools: Read, Glob, Bash(cat *), Bash(cp *), Bash(chmod *), Bash(ls *), Bash(date *), Edit, Write
 ---
 
 ## Input
@@ -96,12 +97,3 @@ Rules:
 - If a time range was provided, only include entries within that window
 - For `/worklog week`, produce one paragraph per day that had activity
 
-## Step 4 — Offer to Save
-
-Use `AskUserQuestion` to ask the user:
-
-- **Save** (Recommended) — Overwrite the raw file with the organized version
-- **Keep raw** — Leave the original file unchanged
-- **Copy** — Save organized version as `YYYYMMDD-organized.md` alongside the original
-
-For weekly summaries, offer to save as `week-YYYYMMDD.md`.
