@@ -3,11 +3,11 @@ name: git-commit
 description: >-
   Create well-formatted git commits following consistent conventions.
   Extracts ticket ID from branch, uses imperative mood, lowercase after prefix.
-  TRIGGER when: user invokes /commit or asks to commit staged changes.
+  TRIGGER when: user invokes /commit, asks to commit staged changes,
+  or an agent needs to create a git commit as part of a task.
   DO NOT TRIGGER when: user wants to push, create a PR, or amend a commit.
-version: 2.0.2
+version: 3.0.0
 effort: low
-disable-model-invocation: true
 allowed-tools: Bash(git diff *), Bash(git status), Bash(git log *), Bash(git branch *), Bash(git add *), Bash(git commit *)
 ---
 

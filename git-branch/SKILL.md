@@ -3,14 +3,14 @@ name: git-branch
 description: >-
   Create well-named git branches with consistent naming conventions.
   Guides through branch type, description, and target branch selection.
-  TRIGGER when: user invokes /git:branch, asks to create a new branch,
-  or wants to start working on a new feature/fix/task.
+  TRIGGER when: user invokes /git-branch, asks to create a new branch,
+  wants to start working on a new feature/fix/task,
+  or an agent needs to create a git branch as part of a task.
   DO NOT TRIGGER when: user wants to switch to an existing branch,
   delete a branch, or rename a branch.
-version: 2.0.2
+version: 3.0.0
 effort: low
-disable-model-invocation: true
-allowed-tools: Bash(git branch *), Bash(git switch *), Bash(git status*), Bash(git stash *), Bash(git fetch *)
+allowed-tools: Bash(git branch *), Bash(git switch *), Bash(git status *), Bash(git stash *)
 ---
 
 ## Input
