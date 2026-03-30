@@ -5,7 +5,7 @@ description: >-
   every prompt from ~/Code/Work/ projects into ~/.claude/worklog/YYYYMMDD.md.
   TRIGGER when: user invokes /worklog or asks to see their work log / diary.
   DO NOT TRIGGER when: user asks about git log or commit history.
-version: 1.0.1
+version: 1.1.0
 effort: medium
 disable-model-invocation: true
 allowed-tools: Read, Glob, Bash(cat *), Bash(cp *), Bash(chmod *), Bash(ls *), Bash(date *), Edit, Write
@@ -28,11 +28,15 @@ Check if the worklog hook is already installed. This step runs silently unless i
 
 Read `~/.claude/settings.json`. If it doesn't exist, treat it as `{}`.
 
-### 0b. Check for existing hook
+### 0b. Prerequisites
+
+The hook requires `jq` to parse prompt input. If `jq` is not installed, the hook will silently skip logging. Ensure `jq` is available before proceeding.
+
+### 0c. Check for existing hook
 
 Look for a `UserPromptSubmit` hook whose command contains `worklog`. If found, skip to Step 1.
 
-### 0c. Install the hook
+### 0d. Install the hook
 
 1. Create `~/.claude/hooks/` directory if it doesn't exist
 2. Copy the hook script from **this skill's directory** (`worklog/hooks/log-prompt.sh`) to `~/.claude/hooks/worklog.sh`

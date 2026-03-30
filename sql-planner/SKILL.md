@@ -4,7 +4,7 @@ description: >-
   Natural language → SQL → execute read queries against the database. Auto-detects local connection, discovers project connectors for remote environments and domain knowledge.
   TRIGGER when: user asks a data question in natural language (count, list, show, verify, check, how many, cuantos, traeme, muéstrame), mentions database tables, or asks about data in any environment (production, staging, dev, local).
   DO NOT TRIGGER when: user provides raw SQL ready to execute.
-version: 2.0.0
+version: 2.0.1
 ---
 
 ## Claim Conditions
@@ -18,7 +18,7 @@ This skill is the entry point for any data question expressed in natural languag
 
 **I do NOT claim when:**
 - User provides a complete SQL query ready to execute
-- User asks to create a connector (use `/sql-planner:new-connector` instead)
+- User asks to create a connector (use `/sql-planner:connector` instead)
 
 ## Input
 
@@ -46,11 +46,10 @@ From the detected engine, infer the SQL dialect (MySQL, PostgreSQL, SQLite).
 
 ### 1b. Discover Connector
 
-Search for project-level connectors:
+Check if `.claude/sql-planner/config.md` exists in the current project directory.
 
-1. Grep for `## SQL Connector` within `.claude/skills/**/SKILL.md` in the current project directory
-2. If found → read the matching file(s) for engine, environments, domain knowledge
-3. If the user asks for a remote environment and NO connector exists → inform them and suggest: `/sql-planner:new-connector`
+1. If found → read it for engine, environments, domain knowledge
+2. If the user asks for a remote environment and NO connector exists → inform them and suggest: `/sql-planner:connector`
 
 ### 1c. Read Schema Cache
 

@@ -1,6 +1,6 @@
 #!/bin/bash
 # Worklog hook — logs every prompt to ~/.claude/worklog/YYYYMMDD.md
-# Designed for UserPromptSubmit hook. Only logs prompts from ~/Code/work/*.
+# Designed for UserPromptSubmit hook. Only logs prompts from ~/Code/Work/*.
 # Always exits 0 to never block the user.
 
 INPUT=$(cat) || exit 0

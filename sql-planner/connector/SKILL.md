@@ -1,13 +1,13 @@
 ---
-name: sql-planner:new-connector
+name: sql-planner:connector
 description: >-
-  Wizard to generate a sql-planner connector for the current project. Creates a project-level skill with domain knowledge, remote environments, and DB engine config.
-version: 1.0.0
+  Wizard to generate a sql-planner connector for the current project. Creates a config file with domain knowledge, remote environments, and DB engine config.
+version: 1.1.0
 ---
 
 Wizard that generates a `sql-planner` connector for the current project.
 
-A connector is a project-level skill that provides `sql-planner` with: domain knowledge (table meanings, relationships, business conventions), remote environment connections, and engine configuration.
+A connector is a config file at `.claude/sql-planner/config.md` that provides `sql-planner` with: domain knowledge (table meanings, relationships, business conventions), remote environment connections, and engine configuration.
 
 ## Step 1 — Gather Context (parallel)
 
@@ -22,7 +22,13 @@ Launch an Agent (subagent_type: Explore) to analyze the project and infer domain
 - Read the DB schema if `.claude/sql-planner/schema.tsv` already exists
 - Infer: what tables exist, how they relate, what fields mean, naming conventions, status/enum values
 
-The agent returns a structured summary of domain knowledge.
+The agent returns a structured summary of domain knowledge following this format — one bullet per entity/table, table name in backticks, key fields and their meanings:
+
+```markdown
+- **Users**: `users_user` is the main user table. `is_coach=1` means provider. `is_active` controls login access.
+- **Sessions**: `signed_in`, `last_activity`, `signed_out` track user login sessions.
+- **Subscriptions**: Stripe integration. `credits` tracks usage allowance.
+```
 
 ### 1b. Detect Engine
 
@@ -42,26 +48,17 @@ Use `AskUserQuestion` to ask: "What remote environments do you want to configure
 
 For each selected environment, ask with `AskUserQuestion`:
 - Connection command or method (SSH tunnel, bastion host, direct connection string, etc.)
-- Example: `ssh staging-bastion "mysql -h staging-db.internal -u app -pXXX mydb --table -e '{sql}'"`
+- Example: `ssh staging-bastion "mysql -h staging-db.internal -u app -p\$DB_PASSWORD mydb --table -e '{sql}'"`
 
 The `{sql}` placeholder is where `sql-planner` will inject the generated query at runtime.
 
 ## Step 3 — Generate Connector
 
-Determine the project name from the current directory name or package config.
-
-Create `.claude/skills/sql-planner-<project>/SKILL.md` with:
+Create `.claude/sql-planner/config.md` with:
 
 ```markdown
----
-name: sql-planner:<project>
-description: Connector for <project> databases
-version: 1.0.0
----
-
-## SQL Connector
-
-- Engine: <detected engine>
+## Engine
+<detected engine>
 
 ## Environments
 
@@ -73,6 +70,10 @@ version: 1.0.0
 <inferred domain knowledge from Step 1>
 ```
 
-## Step 4 — Review
+## Step 4 — Validate
+
+Test the connector by running the schema generation query (from sql-planner Step 1d) against the local environment. If it returns results, the connector is working. If it fails, diagnose and fix the connection command before proceeding.
+
+## Step 5 — Review
 
 Show the generated connector file to the user for review and adjustments. Apply any requested changes before finishing.
