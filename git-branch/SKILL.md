@@ -8,9 +8,9 @@ description: >-
   or an agent needs to create a git branch as part of a task.
   DO NOT TRIGGER when: user wants to switch to an existing branch,
   delete a branch, or rename a branch.
-version: 3.0.0
+version: 4.0.0
 effort: low
-allowed-tools: Bash(git branch *), Bash(git switch *), Bash(git status *), Bash(git stash *)
+allowed-tools: Bash(git branch *) Bash(git switch *) Bash(git status *) Bash(git stash *)
 ---
 
 ## Input

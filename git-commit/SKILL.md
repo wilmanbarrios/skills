@@ -6,9 +6,9 @@ description: >-
   TRIGGER when: user invokes /commit, asks to commit staged changes,
   or an agent needs to create a git commit as part of a task.
   DO NOT TRIGGER when: user wants to push, create a PR, or amend a commit.
-version: 3.0.0
+version: 4.0.0
 effort: low
-allowed-tools: Bash(git diff *), Bash(git status), Bash(git log *), Bash(git branch *), Bash(git add *), Bash(git commit *)
+allowed-tools: Bash(git diff *) Bash(git status) Bash(git log *) Bash(git branch *) Bash(git add *) Bash(git commit *)
 ---
 
 ## Input
